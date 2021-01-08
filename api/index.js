@@ -61,5 +61,13 @@ const httpList = {
 	newChangePassword (query){
 		return request('post', '/admin/member/changePassword', query)
 	},
+	// 开启安全认证
+	openAuthentication (query){
+		return request('post', `/admin/member/secret/openAuthentication/${query.type}`, query)
+	},
+	// 关闭安全认证
+	closeAuthentication (query){
+		return request('post', `/admin/member/secret/closeAuthentication/${query.type}`, query)
+	},
 }
 export default httpList;

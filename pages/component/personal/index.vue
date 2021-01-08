@@ -26,7 +26,7 @@
 					<text class="cs" @click="routerPath('/binding/phone','usual')" v-if="!userInfo.phone">绑定</text>
 					<text class="cs" @click="routerPath('/binding/phone','usual')" v-if="userInfo.phone">重置</text>
 					<uni-text class="lg text-gray cuIcon-titles" v-if="userInfo.phone"></uni-text>
-					<text class="cs" v-if="userInfo.phone">关闭</text>
+					<text class="cs" v-if="userInfo.phone" @click="openClose('SMS',userInfo.phoneAuthStatus)">{{userInfo.phoneAuthStatus == 1 ? '关闭' : '开启'}}</text>
 				</view>
 			</view>
 			<view class="li_i border_btm">
@@ -36,7 +36,7 @@
 					<text class="cs" @click="routerPath('/binding/email','usual')" v-if="!userInfo.email">绑定</text>
 					<text class="cs" @click="routerPath('/binding/email','usual')" v-if="userInfo.email">重置</text>
 					<uni-text class="lg text-gray cuIcon-titles" v-if="userInfo.email"></uni-text>
-					<text class="cs" v-if="userInfo.email">关闭</text>
+					<text class="cs" v-if="userInfo.email" @click="openClose('EMAIL',userInfo.emailAuthStatus)">{{userInfo.emailAuthStatus == 1 ? '关闭' : '开启'}}</text>
 				</view>
 			</view>
 			<view class="li_i border_btm">
@@ -45,7 +45,7 @@
 					<text class="cs" @click="routerPath('/binding/google','usual')" v-if="!userInfo.googleSecret">绑定</text>
 					<text class="cs" @click="routerPath('/binding/google','usual')" v-if="userInfo.googleSecret">重置</text>
 					<uni-text class="lg text-gray cuIcon-titles" v-if="userInfo.googleSecret"></uni-text>
-					<text class="cs" v-if="userInfo.googleSecret">关闭</text>
+					<text class="cs" v-if="userInfo.googleSecret" @click="openClose('GOOGLE_AUTH',userInfo.googleAuthStatus)">{{userInfo.googleAuthStatus == 1 ? '关闭' : '开启'}}</text>
 				</view>
 			</view>
 		</view>
@@ -93,12 +93,14 @@
 				</view>
 			</view>
 		</view>
+		<verification ref="verification" @handleClose ="endVerification"  @close="close" :overtCovert="overtCovert"/>
 	</view>
 </template>
 <script>
 	import {
 		mapState
 	} from 'vuex'
+	import verification from '../../common/verification.vue'
 	export default {
 		name:'personal',
 		data() {
@@ -106,7 +108,17 @@
 				phoneChecked:false,
 				modalName :false,
 				color: "#D8D8D8",
+				closeVerifyType:false,
+				closeVerifyData:'',
+				overtCovert:{
+					SMS:false,
+					EMAIL:false,
+					GOOGLE_AUTH:false,
+				}
 			}
+		},
+		components: {
+			verification
 		},
 		computed: {
 			...mapState({
@@ -141,11 +153,84 @@
 			}
 		},
 		methods: {
-			SwitchB(){
-				this.phoneChecked = !this.phoneChecked
+			endVerification(data) {
+				if (this.closeVerifyType == 1) {
+					this.closeVerifyAjax(data)
+				} else {
+					this.openVerify(data)
+				}
+			},
+			close(){
+				this.overtCovert = {
+					SMS:false,
+					EMAIL:false,
+					GOOGLE_AUTH:false,
+				}
+			},
+			openClose(type,data){
+				if(data == 1){//关闭
+					if(!this.security){
+						uni.showToast({
+							icon: "none",
+							title: "至少开启一项验证",
+							duration: 2000
+						});
+						return false
+					}
+					this.overtCovert = {
+						SMS: this.userInfo.phoneAuthStatus == 1,
+						EMAIL:this.userInfo.emailAuthStatus == 1,
+						GOOGLE_AUTH:this.userInfo.googleAuthStatus == 1,
+					}
+				}else{//开启
+					this.overtCovert[type] = true
+				}
+				this.closeVerifyData = type
+				this.closeVerifyType = data
+				this.$refs.verification.modalStatus = true
+			},
+			openVerify(data) {
+				let query = Object.assign({}, data)
+				query.type = this.closeVerifyData
+				this.$api.openAuthentication(query).then((res) => {
+					if(res && res.data.data){
+						uni.showToast({
+							title: this.closeVerifyType == 1 ? '关闭成功' : '开启成功',
+							duration: 2000
+						});
+						this.$refs.verification.modalStatus = false
+						this.$store.dispatch("getUserDetail")
+					}else{
+						uni.showToast({
+							icon: "none",
+							title: res.data.msg,
+							duration: 2000
+						});
+					}
+				})
+			},
+			closeVerifyAjax(data) {
+				let query = Object.assign({}, data)
+				query.type = this.closeVerifyData
+				this.$api.closeAuthentication(query).then((res) => {
+					if(res && res.data.data){
+						uni.showToast({
+							title: this.closeVerifyType == 1 ? '关闭成功' : '开启成功',
+							duration: 2000
+						});
+						this.$refs.verification.modalStatus = false
+						this.$store.dispatch("getUserDetail")
+					}else{
+						uni.showToast({
+							icon: "none",
+							title: res.data.msg,
+							duration: 2000
+						});
+					}
+				})
 			},
 			hideModal(){
-				this.$store.dispatch('loginOut', this);
+				this.$store.dispatch('loginOut');
 				this.modalName = false
 			},
 			logout(){

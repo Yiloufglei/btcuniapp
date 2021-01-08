@@ -10,21 +10,21 @@
 					</view>
 				</view>
 				<view class="verification_centent min_bj bind_content">
-					<view class="from_ipt" v-if="userInfo.phoneAuthStatus && linkType !== 'SMS' && overtCovert.phone">
+					<view class="from_ipt" v-if="userInfo.phoneAuthStatus && linkType !== 'SMS' && overtCovert.SMS">
 						<view class="from_title ts">{{$common.substrHandle(userInfo.phone)}}</view>
 						<view class="cu-form-group border_btm">
 							<uni-easyinput v-model="fromData.smsCode" class="" placeholder="请输入验证码"></uni-easyinput>
 							<button class='cu-btn bg-green shadow' @click="getCode('SMS')">{{countStatus ? (counttime + 's') : '获取验证码'}}</button>
 						</view>
 					</view>
-					<view class="from_ipt" v-if="userInfo.emailAuthStatus && linkType !== 'EMAIL' && overtCovert.email">
+					<view class="from_ipt" v-if="userInfo.emailAuthStatus && linkType !== 'EMAIL' && overtCovert.EMAIL">
 						<view class="from_title ts">{{$common.substrHandle(userInfo.email)}}</view>
 						<view class="cu-form-group border_btm">
 							<uni-easyinput v-model="fromData.emailCode" class="" placeholder="请输入验证码"></uni-easyinput>
 							<button class='cu-btn bg-green shadow' @click="getCode('EMAIL')">{{emailCountStatus ? (emailCounttime + 's') : '获取验证码'}}</button>
 						</view>
 					</view>
-					<view class="from_ipt" v-if="userInfo.googleAuthStatus && linkType !== 'GOOGLE_AUTH' && overtCovert.google">
+					<view class="from_ipt" v-if="userInfo.googleAuthStatus && linkType !== 'GOOGLE_AUTH' && overtCovert.GOOGLE_AUTH">
 						<view class="from_title ts">谷歌认证</view>
 						<view class="cu-form-group border_btm">
 							<uni-easyinput v-model="fromData.googleAuthCode" class="" placeholder="请输入验证码"></uni-easyinput>
@@ -51,10 +51,12 @@
 			},
 			overtCovert:{
 				type:Object,
-				default:{
-					phone:true,
-					email:true,
-					google:true,
+				default:()=>{
+					return {
+						SMS:true,
+						EMAIL:true,
+						GOOGLE_AUTH:true,
+					}
 				}
 			}
 		},
@@ -80,13 +82,17 @@
 				}
 			}
 		},
+		mounted() {
+			this.fromData = {
+				smsCode: '',
+				emailCode: '',
+				googleAuthCode: '',
+				value:'',
+				username:''
+			}
+		},
 		beforeDestroy() {
-			if(this.counttimer){
-				clearInterval(this.counttimer);
-			}
-			if(this.emailCounttimer){
-				clearInterval(this.emailCounttimer);
-			}
+			this.clearInterval()
 		},
 		computed: {
 			...mapState({
@@ -95,14 +101,36 @@
 			submitClass() {
 				let data = this.fromData
 				let userInfo = this.userInfo
-				if ((userInfo.phoneAuthStatus && data.smsCode) ||  (userInfo.emailAuthStatus && data.emailCode) || (userInfo.googleAuthStatus && data.googleAuthCode)) {
-					return 'submit_bj'
+				let linkType = this.linkType
+				let overtCovert = this.overtCovert
+				let SMS = userInfo.phoneAuthStatus && linkType !== 'SMS' && overtCovert.SMS
+				let EMAIL = userInfo.emailAuthStatus && linkType !== 'EMAIL' && overtCovert.EMAIL
+				let GOOGLE_AUTH = userInfo.googleAuthStatus && linkType !== 'GOOGLE_AUTH' && overtCovert.GOOGLE_AUTH
+				if ((SMS && !data.smsCode) ||  (EMAIL && !data.emailCode) || (GOOGLE_AUTH && !data.googleAuthCode)) {
+					return 'submitErr_bj'
 				}
-				return 'submitErr_bj'
+				return 'submit_bj'
 			},
 		},
 		methods: {
+			clearInterval(){
+				if(this.counttimer){
+					clearInterval(this.counttimer);
+				}
+				if(this.emailCounttimer){
+					clearInterval(this.emailCounttimer);
+				}
+			},
 			Submit(){
+				if(this.submitClass == 'submitErr_bj'){
+					return false
+				}
+				this.counttime = 60;
+				this.countStatus = false
+				this.emailCounttime = 60;
+				this.emailCountStatus = false
+				this.isLoading = true
+				this.clearInterval()
 				this.$emit('handleClose', this.fromData)
 			},
 			getCode(type){
@@ -165,6 +193,7 @@
 			},
 			hideModal(){
 				this.modalStatus = false
+				this.$emit('close')
 			},
 		}
 	}
