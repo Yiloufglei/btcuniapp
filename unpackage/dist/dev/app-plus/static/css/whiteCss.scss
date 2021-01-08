@@ -1,0 +1,99 @@
+
+//框架色
+$frame_color:#F7F7FA;
+//主体色
+$main_color:#FFFFFF;
+//涨幅色
+$buy_color:#02AD8F;
+//跌幅色
+$sell_color:#D14B63;
+//基本字体色
+$min_color:#000;
+//基本字体色
+$title_color:#000;
+//明字体颜色
+$clearfont_color:#242830;
+//暗字体颜色
+$duskfont_color:#8C9FAD;
+//下边框颜色
+$btmBr_color:#E7EBEE;
+//标记
+$sign_color:#0066ED;
+//选中标
+$setsign_color:#6d40e2;
+//收藏色
+$collection_color: #ffbd09;
+//按钮色
+$btn_color: #0066ED;
+//未能选中按钮颜色
+$errbtn_color:#C5E5FF;
+
+.white_theme{
+    background: $main_color;
+    color: $clearfont_color;
+	.cu-custom{
+		.uni-icons{
+			color: $clearfont_color !important;
+		}
+	}
+    .buy{
+        color: $buy_color;
+    }
+    .sell{
+        color: $sell_color;
+    }
+    .frame_bj{
+        background:$frame_color;
+    }
+    .min_bj{
+        background:$main_color;
+    }
+    .submit_bj{
+        background:$btn_color;
+        color: #fff;
+    }
+    .submitErr_bj{
+        background : $errbtn_color;
+        color: #fff;
+    }
+    .border_btm{
+        border-bottom: 1px solid $btmBr_color;
+        .uni-easyinput__content{
+            background: $main_color !important;
+            color:$clearfont_color !important;
+			.uni-input-placeholder{
+				color:$duskfont_color;
+			}
+			.uni-input-input{
+				color:$clearfont_color;
+			}
+            .uni-icons{
+                font-size: 30upx !important;
+            }
+        }
+    }
+	.ts{
+		color: $title_color;
+	}
+	.is{
+		color: $clearfont_color !important;
+	}
+    .ms{
+		color: $min_color;
+	}
+    .cs{
+        color: $sign_color;
+    }
+    .ds{
+        color: $duskfont_color;
+    }
+	.myIpt{
+		.uni-easyinput__content{
+			background:$main_color !important;
+			border-color: $clearfont_color !important;
+			color: $clearfont_color;
+			min-height: auto;
+			height: 80upx;
+		}
+	}
+}
