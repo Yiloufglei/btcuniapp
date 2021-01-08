@@ -26,7 +26,7 @@
 				</view>
 			</view>
 		</view>
-		<verification ref="verification" @handleClose ="endVerification"/>
+		<verification ref="verification" @handleClose ="endVerification" :overtCovert="overtCovert"/>
 	</view>
 </template>
 <script>
@@ -44,6 +44,11 @@
 				fromData: {
 					password: '',
 					random:'',
+				},
+				overtCovert: {
+					SMS:true,
+					EMAIL:true,
+					GOOGLE_AUTH:true,
 				}
 			}
 		},
@@ -83,6 +88,9 @@
 				}
 			},
 			submit(){
+				this.overtCovert.SMS = this.userInfo.phoneAuthStatus == 1 ? true : false
+				this.overtCovert.EMAIL = this.userInfo.emailAuthStatus == 1 ? true : false
+				this.overtCovert.GOOGLE_AUTH = this.userInfo.googleAuthStatus == 1 ? true : false
 				this.$refs.verification.modalStatus = true
 			},
 			endVerification(data){

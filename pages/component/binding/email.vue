@@ -129,7 +129,7 @@
 					if (res && res.data.data) {
 						this.counttime = 60;
 						this.countStatus = false;
-						if(this.needToSafeVerify() && this.security) {
+						if(this.needToSafeVerify() && this.security >= 1) {
 							this.$refs.verification.modalStatus = true
 						} else {
 							this.endVerification()

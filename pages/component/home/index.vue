@@ -13,16 +13,15 @@
 			return {
 			}
 		},
+		components: {
+		},
 		computed: {
 			...mapState({}),
 		},
 		mounted() {
-			
 		},
 		methods: {
-
 		},
-		components: {}
 	}
 </script>
 

@@ -90,13 +90,13 @@
 					if (res && res.data.data) {
 						uni.showToast({
 							title: this.userInfo.phone ? '更换成功' : '绑定成功',
-							duration: 2000
+							duration: 300
 						});
 						clearInterval(this.counttimer)
 						this.$store.dispatch("getUserDetail");
 						setTimeout(() => {
 							this.tabPath()
-						},1000)
+						},300)
 					}
 				}).catch(() => {});
 			},
@@ -112,7 +112,7 @@
 					if (res && res.data.data) {
 						this.counttime = 60;
 						this.countStatus = false;
-						if (this.needToSafeVerify() && this.security) {
+						if (this.needToSafeVerify() && this.security >= 1) {
 							this.$refs.verification.modalStatus = true
 						} else {
 							this.endVerification({})
@@ -135,7 +135,7 @@
 						this.fromData.code = null;
 						uni.showToast({
 							title: res.data.msg,
-							duration: 2000
+							duration: 300
 						});
 						this.countStatus = true
 						this.counttimer = setInterval(() => {

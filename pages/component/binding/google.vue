@@ -133,14 +133,14 @@
 					if (res && res.data.data) {
 						uni.showToast({
 							title: "绑定成功",
-							duration: 1000,
+							duration: 300,
 						});
 						this.$store.dispatch("getUserDetail");
 						setTimeout(() => {
 							uni.navigateTo({
 								url: '/pages/index/index',
 							});
-						},1000)
+						},300)
 					}else{
 						uni.showToast({
 							title: res.data.msg,
@@ -159,7 +159,7 @@
 				}
 				this.$api.checkVerifyOnlyCode(query).then((res) => {
 					if (res && res.data.data) {
-						if (this.needToSafeVerify() && this.security) {
+						if (this.needToSafeVerify() && this.security >= 1) {
 							this.$refs.verification.modalStatus = true
 						} else {
 							this.endVerification()

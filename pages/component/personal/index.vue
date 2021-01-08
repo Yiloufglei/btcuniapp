@@ -11,7 +11,7 @@
 				<view class="grade ds">
 					安全等级：{{securityLevel}}
 				</view>
-				<view class="cu-progress round xs striped" :class="'bg-' + color">
+				<view class="cu-progress round xs striped" :class="'bg-' + stripedColor">
 					<view class="bg-green" :style="[{ width:stripedWidth}]"></view>
 				</view>
 				<view class="title sell">
@@ -61,7 +61,7 @@
 					<text class="cs" @click="routerPath('/binding/tradePassword','password')" v-if="!userInfo.payPassword">设置</text>
 					<text class="cs" @click="routerPath('/binding/tradePassword','password')" v-if="userInfo.payPassword">重置</text>
 					<uni-text class="lg text-gray cuIcon-titles" v-if="userInfo.payPassword"></uni-text>
-					<text class="cs" v-if="userInfo.payPassword">关闭</text>
+					<text class="cs" v-if="userInfo.payPassword" @click="passwordPopUp">{{userInfo.paymentSwitch == 0 ? '关闭' : '开启'}}</text>
 				</view>
 			</view>
 			<view class="li_i border_btm">
@@ -94,6 +94,7 @@
 			</view>
 		</view>
 		<verification ref="verification" @handleClose ="endVerification"  @close="close" :overtCovert="overtCovert"/>
+		<passwordPopUp ref="passwordPopUp" v-if="passwordPopUpStatus" @close="passwordPopUpStatus = false" @submit="passwordPopUpSubmit"/>
 	</view>
 </template>
 <script>
@@ -101,13 +102,13 @@
 		mapState
 	} from 'vuex'
 	import verification from '../../common/verification.vue'
+	import passwordPopUp from '../../common/passwordPopUp.vue'
 	export default {
 		name:'personal',
 		data() {
 			return {
-				phoneChecked:false,
+				passwordPopUpStatus:false,
 				modalName :false,
-				color: "#D8D8D8",
 				closeVerifyType:false,
 				closeVerifyData:'',
 				overtCovert:{
@@ -118,7 +119,8 @@
 			}
 		},
 		components: {
-			verification
+			verification,
+			passwordPopUp
 		},
 		computed: {
 			...mapState({
@@ -130,6 +132,18 @@
 			stripedWidth(){
 				let x = this.userInfo.securityLevel >3 ? 3 : this.userInfo.securityLevel
 				return x * (100 / 3) + '%'
+			},
+			stripedColor(){
+				let Level = this.userInfo.securityLevel
+				if(Level == 1){
+					return 'red' 
+				}else if(Level == 2){
+					return 'yellow'
+				}else if(Level >= 3){
+					return 'green'
+				}else{
+					return 'red'
+				}
 			},
 			securityLevel(){
 				let Level = this.userInfo.securityLevel
@@ -153,6 +167,39 @@
 			}
 		},
 		methods: {
+			passwordPopUpSubmit(val){
+				this.$api.paymentPasswordVerification(val).then((res) => {
+					if(res  && res.data.data){
+						this.passwordPopUpStatus = false
+						this.paymentSwitch()
+					}else{
+						uni.showToast({
+							icon: "none",
+							title: res.data.msg,
+							duration: 2000
+						});
+					}
+				})
+			},
+			paymentSwitch(){
+				let query = this.userInfo.paymentSwitch == 0 ? 1 : 0
+				this.$api.switchPaymentPasswordSwitchModification(query).then((res) => {
+					if(res && res.data.data){
+						uni.showToast({
+							title: '设置成功',
+							duration: 2000
+						});
+						this.$store.dispatch('getUserDetail')
+					}
+				})
+			},
+			passwordPopUp(){
+				if(this.userInfo.paymentSwitch == 0){
+					this.passwordPopUpStatus = true
+				}else{
+					this.paymentSwitch()
+				}
+			},
 			endVerification(data) {
 				if (this.closeVerifyType == 1) {
 					this.closeVerifyAjax(data)
@@ -169,7 +216,7 @@
 			},
 			openClose(type,data){
 				if(data == 1){//关闭
-					if(!this.security){
+					if(this.security <= 1){
 						uni.showToast({
 							icon: "none",
 							title: "至少开启一项验证",
@@ -245,7 +292,7 @@
 					});
 					return false
 				}
-				if(type && !this.security){
+				if(type=="password" && this.security  < 1){
 					uni.showToast({
 						icon: "none",
 						title: "请先绑定一项验证",

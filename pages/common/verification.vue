@@ -9,23 +9,47 @@
 						<text class="cuIcon-close"></text>
 					</view>
 				</view>
-				<view class="verification_centent min_bj bind_content">
+				<view class="verification_centent min_bj bind_content" v-if="judgeSignIn">
 					<view class="from_ipt" v-if="userInfo.phoneAuthStatus && linkType !== 'SMS' && overtCovert.SMS">
 						<view class="from_title ts">{{$common.substrHandle(userInfo.phone)}}</view>
 						<view class="cu-form-group border_btm">
-							<uni-easyinput v-model="fromData.smsCode" class="" placeholder="请输入验证码"></uni-easyinput>
+							<uni-easyinput v-model="fromData.smsCode" placeholder="请输入验证码"></uni-easyinput>
 							<button class='cu-btn bg-green shadow' @click="getCode('SMS')">{{countStatus ? (counttime + 's') : '获取验证码'}}</button>
 						</view>
 					</view>
 					<view class="from_ipt" v-if="userInfo.emailAuthStatus && linkType !== 'EMAIL' && overtCovert.EMAIL">
 						<view class="from_title ts">{{$common.substrHandle(userInfo.email)}}</view>
 						<view class="cu-form-group border_btm">
-							<uni-easyinput v-model="fromData.emailCode" class="" placeholder="请输入验证码"></uni-easyinput>
+							<uni-easyinput v-model="fromData.emailCode" placeholder="请输入验证码"></uni-easyinput>
 							<button class='cu-btn bg-green shadow' @click="getCode('EMAIL')">{{emailCountStatus ? (emailCounttime + 's') : '获取验证码'}}</button>
 						</view>
 					</view>
 					<view class="from_ipt" v-if="userInfo.googleAuthStatus && linkType !== 'GOOGLE_AUTH' && overtCovert.GOOGLE_AUTH">
-						<view class="from_title ts">谷歌认证</view>
+						<view class="from_title ts">谷歌认证码</view>
+						<view class="cu-form-group border_btm">
+							<uni-easyinput v-model="fromData.googleAuthCode" placeholder="请输入验证码"></uni-easyinput>
+						</view>
+					</view>
+					<button class="cu-btn lg submitBtn" :class="submitClass" @click="Submit"><text v-if="isLoading" class="cuIcon-loading2 cuIconfont-spin"
+						 style="margin-right: 10upx;"></text>{{isLoading ? '提交中...' : '提交'}}</button>
+				</view>
+				<view class="verification_centent min_bj bind_content" v-else>
+					<view class="from_ipt">
+						<view class="from_title ts">手机验证码</view>
+						<view class="cu-form-group border_btm">
+							<uni-easyinput v-model="fromData.smsCode" placeholder="请输入验证码"></uni-easyinput>
+							<button class='cu-btn bg-green shadow' @click="getCode('SMS')">{{countStatus ? (counttime + 's') : '获取验证码'}}</button>
+						</view>
+					</view>
+					<view class="from_ipt" v-if="userInfo.emailAuthStatus && linkType !== 'EMAIL' && overtCovert.EMAIL">
+						<view class="from_title ts">邮箱验证码</view>
+						<view class="cu-form-group border_btm">
+							<uni-easyinput v-model="fromData.emailCode" placeholder="请输入验证码"></uni-easyinput>
+							<button class='cu-btn bg-green shadow' @click="getCode('EMAIL')">{{emailCountStatus ? (emailCounttime + 's') : '获取验证码'}}</button>
+						</view>
+					</view>
+					<view class="from_ipt">
+						<view class="from_title ts">谷歌认证码</view>
 						<view class="cu-form-group border_btm">
 							<uni-easyinput v-model="fromData.googleAuthCode" class="" placeholder="请输入验证码"></uni-easyinput>
 						</view>
@@ -58,10 +82,12 @@
 						GOOGLE_AUTH:true,
 					}
 				}
-			}
+			},
 		},
 		data() {
 			return {
+				userName:'',
+				
 				counttime:60,
 				emailCounttime:60,
 				
@@ -82,13 +108,15 @@
 				}
 			}
 		},
-		mounted() {
-			this.fromData = {
-				smsCode: '',
-				emailCode: '',
-				googleAuthCode: '',
-				value:'',
-				username:''
+		watch:{
+			modalStatus:function(){
+				this.fromData = {
+					smsCode: '',
+					emailCode: '',
+					googleAuthCode: '',
+					value:'',
+					username:''
+				}
 			}
 		},
 		beforeDestroy() {
@@ -97,6 +125,7 @@
 		computed: {
 			...mapState({
 				userInfo: (state) => state.userInfo,
+				judgeSignIn: (state) => state.judgeSignIn,
 			}),
 			submitClass() {
 				let data = this.fromData
@@ -129,7 +158,6 @@
 				this.countStatus = false
 				this.emailCounttime = 60;
 				this.emailCountStatus = false
-				this.isLoading = true
 				this.clearInterval()
 				this.$emit('handleClose', this.fromData)
 			},
@@ -138,7 +166,11 @@
 					if(this.countStatus){
 						return false
 					}
-					this.fromData.value = `+86-${this.userInfo.phone}`
+					if(this.userName){
+						this.fromData.value = null
+					}else{
+						this.fromData.value = `+86-${this.userInfo.phone}`
+					}
 				}
 				if(type == 'EMAIL'){
 					if(this.emailCountStatus){
@@ -147,7 +179,7 @@
 					this.fromData.value = this.userInfo.email
 				}
 				this.fromData.type = type
-				this.fromData.username = this.userInfo.username
+				this.fromData.username = this.userName || this.userInfo.username
 				this.$api.sendVerifyCode(this.fromData).then(res => {
 					if (res && res.data.data) {
 						uni.showToast({

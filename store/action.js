@@ -12,8 +12,8 @@ export default {
 					commit("setjudgeSignIn", true);
 					let arr = [data.emailAuthStatus, data.phoneAuthStatus, data.googleAuthStatus]
 					let resultList = arr.filter(v => v === 1)
-					let type =  resultList.length >= 2
-					commit("setSecurity", type);
+					let length =  resultList.length
+					commit("setSecurity", length);
 				}
 			})
 		})

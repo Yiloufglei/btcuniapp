@@ -12,7 +12,7 @@ const store = new Vuex.Store({
 		themeColor:'white',//主题颜色
 		userInfo:{},
 		judgeSignIn:false,//是否登录
-		security:false,//绑定大于1
+		security:0,//绑定大于1
 	},
 	mutations,
 	actions

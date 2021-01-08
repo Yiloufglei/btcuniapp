@@ -19,7 +19,7 @@
 					<uni-easyinput type="password" v-model="fromData.password"  placeholder="请输入登录密码"></uni-easyinput>
 				</view>
 			</view>
-			<button class="cu-btn submitBtn lg" @click="returnPreLoginResult" :class="submitClass"><text v-if="isLogin" class="cuIcon-loading2 cuIconfont-spin" style="margin-right: 10upx;"></text>{{isLogin ? '登录中...' : '登录'}}</button>
+			<button class="cu-btn submitBtn lg" @click="returnPreLoginResult" :class="submitClass"><text v-if="isLoading" class="cuIcon-loading2 cuIconfont-spin" style="margin-right: 10upx;"></text>{{isLoading ? '登录中...' : '登录'}}</button>
 			<view class="forgetpad cs" @click="routerPath('/signUp/forgetPassword')">
 				忘记密码？
 			</view>
@@ -39,7 +39,7 @@
 		name: 'signIn',
 		data() {
 			return {
-				isLogin:false,
+				isLoading:false,
 				fromData: {
 					username: '',
 					password: '',
@@ -99,19 +99,19 @@
 						uni.navigateTo({
 							url: "/pages/index/index",
 						});
-						this.isLogin = false
+						this.isLoading = false
 					},300)
 				}).catch(error => {
-					this.isLogin = false
+					this.isLoading = false
 					console.log(error,'error')
 				})
 			},
 			// 预登录
 			returnPreLoginResult() {
-				if(this.isLogin){
+				if(this.isLoading){
 					return false
 				}
-				this.isLogin = true
+				this.isLoading = true
 				let username = this.fromData.username.toLowerCase();
 				let password = this.fromData.password
 				this.$api.preLogin({
@@ -129,7 +129,7 @@
 						    title: res.data.msg,
 						    duration: 2000
 						});
-						this.isLogin = false
+						this.isLoading = false
 					}
 				})
 			},

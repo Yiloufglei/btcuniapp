@@ -57,6 +57,14 @@ const httpList = {
 	newSetPaymentPassword (query){
 		return request('post', `/admin/member/setPaymentPassword`, query)
 	},
+	// 支付密码校验
+	paymentPasswordVerification (query){
+		return request('get', `/admin/member/paymentPasswordVerification/${query}`, {})
+	},
+	// 修改支付密码状态
+	switchPaymentPasswordSwitchModification (query){
+		return request('get', `/admin/member/paymentPasswordSwitchModification/${query}`, {})
+	},
 	// 新版重置密码
 	newChangePassword (query){
 		return request('post', '/admin/member/changePassword', query)

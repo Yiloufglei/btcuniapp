@@ -12,7 +12,7 @@
 			</view>
 			<view class="from_ipt">
 				<view class="cu-form-group border_btm">
-					<uni-easyinput @input="nickNameInput" v-model="fromData.nickName" placeholder="请输入用户名"></uni-easyinput>
+					<uni-easyinput  @input="nickNameInput" v-model="fromData.nickName" placeholder="请输入用户名"></uni-easyinput>
 					<text class="sell">{{nickNameErrText}}</text>
 				</view>
 				<view class="cu-form-group border_btm">
@@ -24,10 +24,11 @@
 					<text class="sell">{{randomErrText}}</text>
 				</view>
 				<view class="cu-form-group border_btm">
-					<uni-easyinput v-model="fromData.invitationCode" class="border_btm" placeholder="邀请码"></uni-easyinput>
+					<uni-easyinput  @input="invitationCodeInput" v-model="fromData.invitationCode" class="border_btm" placeholder="邀请码"></uni-easyinput>
+					<text class="sell">{{invitationCodeErrText}}</text>
 				</view>
 			</view>
-			<button class="cu-btn lg submitBtn" @click="submitRegister" :class="submitClass"><text v-if="isLogin" class="cuIcon-loading2 cuIconfont-spin" style="margin-right: 10upx;"></text>{{isLogin ? '注册中...' : '注册'}}</button>
+			<button class="cu-btn lg submitBtn" @click="submitRegister" :class="submitClass"><text v-if="isLoading" class="cuIcon-loading2 cuIconfont-spin" style="margin-right: 10upx;"></text>{{isLoading ? '注册中...' : '注册'}}</button>
 			<view class="forgetpad cs f_cc">
 				<label class="radio">
 					<radio value="r1" :checked="checked" @click="radioChange"/></label>
@@ -48,11 +49,12 @@
 		name: 'register',
 		data() {
 			return {
-				isLogin:false,
+				isLoading:false,
 				checked: false,
 				passwordErrText:'',
 				randomErrText:'',
 				nickNameErrText:'',
+				invitationCodeErrText:'',
 				fromData:{
 					status:1,
 					username: '1',
@@ -81,6 +83,13 @@
 			},
 		},
 		methods: {
+			invitationCodeInput(){
+				if(this.fromData.invitationCode.length < 1){
+					this.invitationCodeErrText = '邀请码不能为空'
+				}else{
+					this.invitationCodeErrText = ''
+				}
+			},
 			nickNameInput(e){
 				if(this.fromData.nickName.length < 1){
 					this.nickNameErrText = '用户名不能为空'
@@ -93,6 +102,9 @@
 			passwordInput(e){
 				this.fromData.random = ""
 				this.randomErrText = ""
+				this.passwordInputVa()
+			},
+			passwordInputVa(){
 				const passwordRegx = /^[^ ]{6,}$/;
 				if(this.fromData.password.length < 1){
 					this.passwordErrText = '请输入密码'
@@ -125,13 +137,24 @@
 				});
 			},
 			submitRegister() {
-				if(this.submitClass !== 'submit_bj' || this.isLogin){
-					this.nickNameInput()
-					this.passwordInput()
-					this.randomInput()
+				if(this.isLoading){
 					return false
 				}
-				this.isLogin = true
+				if(this.submitClass !== 'submit_bj' || this.isLoading){
+					this.nickNameInput()
+					this.invitationCodeInput()
+					this.passwordInputVa()
+					this.randomInput()
+					if(!this.checked){
+						uni.showToast({
+							icon :"none",
+						    title: "请同意用户协议",
+						    duration: 2000
+						});
+					}
+					return false
+				}
+				this.isLoading = true
 				this.fromData.username = this.fromData.nickName.toLowerCase();
 				this.$api.userRegister(this.fromData).then(res => {
 					console.log(res.data,'tres')
@@ -141,14 +164,14 @@
 						    title: res.data.msg,
 						    duration: 2000
 						});
-						this.isLogin = false
+						this.isLoading = false
 					}else{
 						uni.showToast({
 						    title: res.data.msg,
 						    duration: 300
 						});
 						setTimeout(() => {
-							this.isLogin = false
+							this.isLoading = false
 							this.routerPath('/signUp/signIn')
 						},300)
 					}

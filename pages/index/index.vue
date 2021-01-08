@@ -66,16 +66,22 @@
 				themeColor:(state) => state.themeColor,
 			}),
 		},
+		onShow() {
+			this.$nextTick(function() {
+				this.$common.setNaviBarColor()
+			})
+		},
 		mounted() {
 			let tabIndex = this.$common.getCache('tabIndex') || 'home'
 			this.$common.setCache('tabIndex',tabIndex)
-			this.$common.setNaviBarColor()
+			this.$store.commit('switchTabIndex',tabIndex)
 		},
 		methods: {
 			NavChange: function(e) {
 				if(e.currentTarget.dataset.cur !== 'transaction'){
 					this.$common.setCache('tabIndex',e.currentTarget.dataset.cur)
 				}
+				this.$common.setCache('tabIndex',e.currentTarget.dataset.cur)
 				this.$store.commit('switchTabIndex',e.currentTarget.dataset.cur)
 			}
 		},
