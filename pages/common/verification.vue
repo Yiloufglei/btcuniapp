@@ -169,7 +169,7 @@
 					if(this.userName){
 						this.fromData.value = null
 					}else{
-						this.fromData.value = `+86-${this.userInfo.phone}`
+						this.fromData.value = `${this.userInfo.countryCode}-${this.userInfo.phone}`
 					}
 				}
 				if(type == 'EMAIL'){

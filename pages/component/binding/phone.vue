@@ -13,6 +13,14 @@
 				<view class="from_title">手机号</view>
 				<view class="cu-form-group border_btm">
 					<uni-easyinput v-model="fromData.phone" type="number" placeholder="请输入手机号"></uni-easyinput>
+					<view class="cu-capsule radius" @click="phoneSelect">
+						<view class='cu-tag bg-blue '>
+							+{{mobileAreaPhone}}
+						</view>
+						<view class="cu-tag line-blue" style="border: 2upx solid #0066ED;">
+							{{mobileAreaName}}
+						</view>
+					</view>
 				</view>
 				<view class="from_title">手机验证码</view>
 				<view class="cu-form-group border_btm">
@@ -23,6 +31,7 @@
 					 style="margin-right: 10upx;"></text>{{isLoading ? '提交中...' : '提交'}}</button>
 			</view>
 		</view>
+		
 		<verification ref="verification" @handleClose ="endVerification" linkType="SMS"/>
 	</view>
 </template>
@@ -39,6 +48,8 @@
 				counttime: 60,
 				counttimer: null,
 				isLoading: false,
+				mobileAreaPhone:'',
+				mobileAreaName:'',
 				fromData: {
 					phone: '',
 					smsCode: '',
@@ -50,6 +61,11 @@
 		},
 		components: {
 			verification
+		},
+		onShow() {
+			let mobileArea =  this.$common.getCache('mobileArea')
+			this.mobileAreaPhone = mobileArea.countriesCode || '86'
+			this.mobileAreaName = mobileArea.countriesCn || '中国'
 		},
 		beforeDestroy() {
 			if (this.counttimer) {
@@ -77,6 +93,11 @@
 			},
 		},
 		methods: {
+			phoneSelect(){
+				uni.navigateTo({
+					url: '/pages/component/phoneList/index',
+				});
+			},
 			needToSafeVerify() {
 				if (this.userInfo.phoneAuthStatus === 1 || this.userInfo.emailAuthStatus === 1 || this.userInfo.googleAuthStatus === 1) {
 					return true
@@ -85,7 +106,7 @@
 			},
 			endVerification(data) {
 				let query = data ? Object.assign(data,this.fromData) : this.fromData
-				query.value = `+86-${this.fromData.phone}`
+				query.value = `+${this.mobileAreaPhone}-${this.fromData.phone}`
 				this.$api.authenticationSafe(query).then(res => {
 					if (res && res.data.data) {
 						uni.showToast({
@@ -104,7 +125,7 @@
 				if(this.isLoading || this.submitClass == 'submitErr_bj'){
 					return false
 				}
-				this.fromData.value = `+86-${this.fromData.phone}`
+				this.fromData.value = `+${this.mobileAreaPhone}-${this.fromData.phone}`
 				this.fromData.username = this.userInfo.username
 				this.fromData.code = this.fromData.smsCode
 				this.isLoading = true;
@@ -128,7 +149,7 @@
 				})
 			},
 			getCode() {
-				this.fromData.value = `+86-${this.fromData.phone}`
+				this.fromData.value = `+${this.mobileAreaPhone}-${this.fromData.phone}`
 				this.fromData.username = this.userInfo.username
 				this.$api.sendVerifyCode(this.fromData).then(res => {
 					if (res && res.data.data) {

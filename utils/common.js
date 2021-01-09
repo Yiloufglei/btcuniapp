@@ -33,6 +33,7 @@ const current = {
     nextlogin() {
 		uni.removeStorageSync("token");
 		uni.removeStorageSync("username");
+		uni.removeStorageSync("mobileArea");
 		store.commit('setjudgeSignIn', false)
 		store.commit("setuserInfo", {});
     },

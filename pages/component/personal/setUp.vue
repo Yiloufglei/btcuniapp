@@ -38,6 +38,11 @@
 				language:(state) => state.language,
 			}),
 		},
+		onShow() {
+			this.$nextTick(function() {
+				this.$common.setNaviBarColor()
+			})
+		},
 		onLoad() {
 			this.switchD = uni.getStorageSync('colorTheme') == 'black' ? true : false
 		},

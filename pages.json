@@ -49,6 +49,14 @@
 			}
 		},
 		{
+			"path": "pages/component/phoneList/index",
+			"style": {
+				"app-plus":{
+					"titleNView":false
+				}
+			}
+		},
+		{
 			"path": "pages/component/binding/email",
 			"style": {
 				"app-plus":{

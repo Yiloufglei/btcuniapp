@@ -87,6 +87,9 @@ $errbtn_color:#C5E5FF;
     .ds{
         color: $duskfont_color;
     }
+	.bb{
+		border-bottom: 1px solid $btmBr_color;
+	}
 	.myIpt{
 		.uni-easyinput__content{
 			background:$main_color !important;
