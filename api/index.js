@@ -6,7 +6,7 @@ import request from '@/utils/request'; // 导入http中创建的request实例
 
 const httpList = {
     //新闻数据
-    getNewsList(query){
+    getNewsList (query){
         return request('GET', `/core/api/news/list`, query)
     },
 	// 获取tv历史数据
@@ -76,6 +76,10 @@ const httpList = {
 	// 关闭安全认证
 	closeAuthentication (query){
 		return request('post', `/admin/member/secret/closeAuthentication/${query.type}`, query)
+	},
+	// 修改用户头像
+	userEdit (query){
+		return request('put', '/admin/user/edit', query)
 	},
 }
 export default httpList;

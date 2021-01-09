@@ -13,11 +13,16 @@ const i18n = new VueI18n({
 		'en': require('./common/lang/en.js').lang
 	}
 })
+const appurl = 'http://120.79.168.4:9080';
 Vue.prototype._i18n = i18n
 Vue.prototype.$api = api
 Vue.prototype.$store = store
 Vue.prototype.$common = common
 Vue.config.productionTip = false
+Vue.prototype.appurl = appurl;  
+Vue.prototype.getImgUrl = function(data){
+	return appurl + data
+}
 import cuCustom from '@/colorui/components/cu-custom.vue'
 Vue.component('cu-custom',cuCustom)
 App.mpType = 'app'

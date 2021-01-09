@@ -68,16 +68,10 @@
 		methods: {
 			submitLogin() {
 				let baseUrl = ''
-				if(process.env.NODE_ENV === 'development'){
-					//测试环境 
-				     baseUrl = 'http://120.79.168.4:9080'
-				}else{
-				     baseUrl = 'https://bitcasset.com'
-				}
 				this.fromData.username = this.fromData.username.toLowerCase();
 				uni.request({
 					method: "POST",
-					url: `${baseUrl}/auth/oauth/token?username=${this.fromData.username}`,
+					url: `${this.appurl}/auth/oauth/token?username=${this.fromData.username}`,
 					data: qs.stringify(this.fromData),
 					sslVerify:false,
 					firstIpv4:true,

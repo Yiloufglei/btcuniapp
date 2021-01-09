@@ -3,9 +3,9 @@ let baseUrl = 'http://okbix-gateway:9999'
 const request = (type = 'GET', url = '', date = {},  header = {}) => {
 	if(process.env.NODE_ENV === 'development'){
 		//测试环境 
-	     baseUrl = 'http://120.79.168.4:9080'
+	    baseUrl = 'http://120.79.168.4:9080'
 	}else{
-	     baseUrl = 'https://bitcasset.com'
+	    baseUrl = 'https://bitcasset.com'
 	}
 	return new Promise((resolve, reject) => {
 		let headerObj =  header 
